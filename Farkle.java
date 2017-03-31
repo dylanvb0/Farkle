@@ -41,7 +41,7 @@ public class Farkle {
 			System.out.println("Player 2 points: " + player2);
 			CurrentTurn roll = new CurrentTurn();
 			while(true){
-				if (roll.rollDice()){
+				if (roll.rollDice(1,6,6,1,6,6)){
 					ArrayList<Integer>hold = new ArrayList<Integer>();
 					System.out.println("Which dice would you like to remove>>");
 					String inputString = input.nextLine();

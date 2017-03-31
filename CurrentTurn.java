@@ -18,7 +18,7 @@ import java.util.LinkedHashMap;
  * 3 ones - 1000 points
  * 3 twos-sixes - 100*number on dice
  * 1 through 6 straight - 3000 points
- * 3 pairs - 1500 points (including 4-of-a-kind and a pair)
+ * 3 pairs - 1500 points (including 4-of-a-kind and a pair) //NOT WORKING YET
  * 4 of a kind - 1000 points
  * 5 of a kind - 2000 points
  * 6 of a kind - 3000 points
@@ -46,9 +46,21 @@ public class CurrentTurn {
 			}else{
 				System.out.print("X, ");
 			}
-			
-			
 		}
+		return !checkFarkle();
+	}
+	
+	public boolean rollDice(int a, int b, int c, int d, int e, int f){
+		System.out.print("Dice are: ");
+			dice[0] = a;
+			dice[1] = b;
+			dice[2] = c;
+			dice[3] = d;
+			dice[4] = e;
+			dice[5] = f;
+			for(int die : dice){
+				System.out.print(die + ", ");
+			}
 		return !checkFarkle();
 	}
 	
@@ -284,21 +296,31 @@ public class CurrentTurn {
 		for(int i = 0; i < numOfNums.length; i++){
 			if(numOfNums[i] == 4){
 				numPairs += 2;
-				for(int ii = 0; ii < dice.length; ii++){
-					if(dice[ii] == i + 1 && currentRollHold[ii]){
-						holdDice[ii] = true;
-						currentRollHold[ii] = false;
-					}
-				}
 			}else if(numOfNums[i] == 2){
 				numPairs++;
-				for(int ii = 0; ii < dice.length; ii++){
-					if(dice[ii] == i + 1 && currentRollHold[ii]){
-						holdDice[ii] = true;
-						currentRollHold[ii] = false;
+			}
+		}
+		if(numPairs == 3){
+			for(int i = 0; i < numOfNums.length; i++){
+				if(numOfNums[i] == 4){
+					numPairs += 2;
+					for(int ii = 0; ii < dice.length; ii++){
+						if(dice[ii] == i + 1 && currentRollHold[ii]){
+							holdDice[ii] = true;
+							currentRollHold[ii] = false;
+						}
+					}
+				}else if(numOfNums[i] == 2){
+					numPairs++;
+					for(int ii = 0; ii < dice.length; ii++){
+						if(dice[ii] == i + 1 && currentRollHold[ii]){
+							holdDice[ii] = true;
+							currentRollHold[ii] = false;
+						}
 					}
 				}
 			}
+			return 1500;
 		}
 		return 0;
 	}
