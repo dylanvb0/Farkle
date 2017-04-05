@@ -12,13 +12,15 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
+import javax.script.ScriptException;
+
 /*Scoring Guidelines:
  * 1 - 100 points
  * 5 - 50 points
  * 3 ones - 1000 points
  * 3 twos-sixes - 100*number on dice
  * 1 through 6 straight - 3000 points
- * 3 pairs - 1500 points (including 4-of-a-kind and a pair) //NOT WORKING YET
+ * 3 pairs - 1500 points (including 4-of-a-kind and a pair)
  * 4 of a kind - 1000 points
  * 5 of a kind - 2000 points
  * 6 of a kind - 3000 points
@@ -29,13 +31,23 @@ public class CurrentTurn {
 	private boolean[] holdDice;
 	private boolean[] currentRollHold;
 	private int turnScore;
+	public static CurrentTurn currentTurn;
 	
 	//constructor
 	public CurrentTurn(){
 		dice = new int[6];
 		holdDice = new boolean[6];
 		currentRollHold = new boolean[6];
+		CurrentTurn.currentTurn = this;
 	}
+	
+	/**
+	 * @return the dice
+	 */
+	public int[] getDice() {
+		return dice;
+	}
+
 	
 	public boolean rollDice(){
 		System.out.print("Dice are: ");
@@ -46,6 +58,10 @@ public class CurrentTurn {
 			}else{
 				System.out.print("X, ");
 			}
+		}
+		FarkleFrame.frame.setDiceImages(dice);
+		for(int i = 0; i < currentRollHold.length; i++){
+			currentRollHold[i] = false;
 		}
 		return !checkFarkle();
 	}
@@ -61,6 +77,17 @@ public class CurrentTurn {
 			for(int die : dice){
 				System.out.print(die + ", ");
 			}
+			int[] imageDice = dice;
+			for(int i = 0; i < dice.length; i++){
+				if(holdDice[i]){
+					imageDice[i] = 0;
+				}
+			}
+			for(int i = 0; i < currentRollHold.length; i++){
+				currentRollHold[i] = false;
+			}
+			FarkleFrame.frame.setDiceImages(dice);
+
 		return !checkFarkle();
 	}
 	
@@ -91,6 +118,27 @@ public class CurrentTurn {
 	}
 	
 	/*BEGIN - Check Farkle Methods*/
+
+	/**
+	 * @return the holdDice
+	 */
+	public boolean[] getHoldDice() {
+		return holdDice;
+	}
+
+	/**
+	 * @return the currentTurn
+	 */
+	public static CurrentTurn getCurrentTurn() {
+		return currentTurn;
+	}
+
+	/**
+	 * @return the currentRollHold
+	 */
+	public boolean[] getCurrentRollHold() {
+		return currentRollHold;
+	}
 
 	private boolean checkSixOfAKind() {
 		int[] numOfNums = getNumOfNumsCheck();
@@ -361,9 +409,25 @@ public class CurrentTurn {
 		turnScore += scoreOnes();
 		turnScore += scoreFives();
 		System.out.println("Current Score is: " + turnScore);
+		FarkleFrame.frame.turnScore.setText(turnScore + "");
 	}
 
-	
+	public int checkScore(ArrayList<Integer> holdDice) {
+		holdDice(holdDice);
+		int rollScore = 0;
+		rollScore += scoreSixOfAKind();
+		rollScore += scoreStraight();
+		rollScore += scoreFiveOfAKind();
+		rollScore += scoreThreePairs();
+		rollScore += scoreFourOfAKind();
+		rollScore += scoreThreeOfAKind();
+		rollScore += scoreOnes();
+		rollScore += scoreFives();
+		for(int i = 0; i < holdDice.size(); i++){
+			currentRollHold[holdDice.get(i)] = false;
+		}
+		return rollScore;
+	}
 
 	
 
