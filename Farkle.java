@@ -1,14 +1,20 @@
 /*Dylan Vander Berg and Dan Kelly
 *Farkle
 *Main game class
-*Code written primarily by Dan Kelly
+* Code written primarily by Dan Kelly
+* Dan - 70 lines
+* Dylan - 50 lines
  */
 
 package farkle;
 
+import java.awt.Color;
 import java.awt.EventQueue;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Scanner; 
+import java.util.Scanner;
+
+import javax.swing.JOptionPane; 
 
 public class Farkle {
 	private static boolean player1Turn;
@@ -19,115 +25,87 @@ public class Farkle {
 	static ArrayList<Integer>hold;
 	
 	public static void main(String[] args) {		
-		Scanner input = new Scanner(System.in);
-		
-		//setup gui
-		//setup game variables (points, turn, etc.)
-		//while points < 10,000
-		//roll dice
-		//select dice to keep
-		//add points to current turn
-		//user can roll again or bank points
-		//on farkle, toggle turn
-		//on bank points, add turn score to point, toggle turn
-
 		frame = new FarkleFrame();
-        frame.setVisible(true);
-		
-		
-		
+        frame.setVisible(true);	
 		setPlayer1Turn(true);
-//		while (player1 < 10000 && player2 < 10000){
-//			setPlayer1Turn(!isPlayer1Turn());
-//			if(isPlayer1Turn()){
-//				System.out.println("Player 1 turn.");
-//			}else{
-//				System.out.println("Player 2 turn.");
-//			}
-//			System.out.println("Player 1 points: " + player1);
-//			System.out.println("Player 2 points: " + player2);
-//			CurrentTurn roll = new CurrentTurn();
-//			while(true){
-//				if (roll.rollDice(1,6,6,1,6,6)){
-//					frame.disableButtons();
-//					hold = new ArrayList<Integer>();
-//					System.out.println("Which dice would you like to remove>>");
-//					String inputString = input.nextLine();
-//					System.out.print(inputString);
-//					while(!inputString.equals("")){
-//						hold.add(Integer.parseInt(inputString.substring(0, 1)));
-//						if(inputString.length() > 2){
-//							inputString = inputString.substring(2);
-//						}else{
-//							break;
-//						}
-//					}
-//					roll.holdDice(hold);
-//					roll.scoreTurn();
-//					System.out.println("Do you want to roll again? y for yes and n for no");
-//					frame.enableButtons();
-//				}
-//				//if person farkled
-//				else{
-//					System.out.println("Farkle");
-//					break;
-//				}
-//			}
-//		}
 
 	}
 	public static void rollDice(){
-		if(CurrentTurn.currentTurn == null){
+		if(CurrentTurn.currentTurn == null){//if first roll of turn, set up turn
 			hold = new ArrayList<Integer>();
 			roll = new CurrentTurn();
-			frame.mainOut.setText("");
+			frame.clearMessage();
+			frame.appendMessage("Player " + (player1Turn?1:2) + " Turn");
+			frame.resetDice();
 		}
-		if (roll.rollDice(1,2,4,4,5,2)){
+		roll.scoreTurn();
+		//check if all dice were used
+		boolean allUsed = true;
+		for(boolean b : roll.getHoldDice()){
+			allUsed = !b ? false : allUsed;
+		}
+		//if all used, let them roll all 5 again
+		if(allUsed){
+			roll.clearHoldDice();
+			frame.resetDice();
+		}
+		if (roll.rollDice()){//roll dice
 			frame.disableButtons();
 			frame.selectDice = true;
 			int[] dice = CurrentTurn.currentTurn.getDice();
+			//create string from dice
 			String msg = "";
+			boolean first = true;
 			for(int i = 0; i < dice.length; i++){
-				if(i != 0){
-					msg += ", " + dice[i];
-				}else{
-					msg += dice[i];
+				if(!roll.getHoldDice()[i]){
+					if(!first){
+						msg += ", " + dice[i];
+					}else{
+						msg += dice[i];
+						first = false;
+					}
 				}
 			}
-			frame.appendMessage("Rolled " + msg);
-		}else{
+			frame.appendMessage("Rolled " + msg);//output msg to main message output
+			hold.clear();
+		}else{//farkled
 			frame.selectDice = false;
 			frame.enableButtons();
+			frame.disableBank();//don't allow player to bank points from farkled turn
 			player1Turn = !player1Turn;
 			frame.appendMessage("Farkle");
 			frame.appendMessage("Player " + (player1Turn ? 1 : 2) + " Turn");
 			CurrentTurn.currentTurn = null;
-			frame.resetDice();
+			
 		}
 	}
 	
 	public static void bankPoints(){
+		roll.scoreTurn();//score turn based on selected dice
 		if(isPlayer1Turn()){
 			player1 += roll.getTurnScore();
-			if(player1 > 10000){
+			frame.player1Score.setText(player1 + "");
+			frame.player2Label.setForeground(Color.DARK_GRAY);
+			if(player1 > 10000){//if player won
 				frame.appendMessage("Player 1 wins");
 				frame.disableButtons();
+				JOptionPane.showMessageDialog(frame, "Player 1 wins!");//prompt winner
+				System.exit(0);
 			}
-			player1Turn = false;
-			frame.appendMessage("Player 2 Turn");
-			CurrentTurn.currentTurn = null;
 		}
 		else{
 			player2 += roll.getTurnScore();
+			frame.player2Score.setText(player2 + "");
+			frame.player1Label.setForeground(Color.DARK_GRAY);
 			if(player2 > 10000){
 				frame.appendMessage("Player 2 wins");
-				frame.disableButtons();
+				JOptionPane.showMessageDialog(frame, "Player 2 wins!");
+				System.exit(0);
 			}
-			player1Turn = true;
-			frame.appendMessage("Player 1 Turn");
-			CurrentTurn.currentTurn = null;
 		}
-		
+		player1Turn = !player1Turn;//toggle turn
+		frame.appendMessage("Player " + (player1Turn?1:2) + " Turn");//display turn
+		CurrentTurn.currentTurn = null;
 	}
 	//method selectDie
 	//method hold

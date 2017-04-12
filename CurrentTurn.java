@@ -1,12 +1,12 @@
 /*Dylan Vander Berg and Dan Kelly
 *Farkle
 *Current Turn Class
-*Code written primarily by Dylan Vander Berg
-*Note - Even though there is more code here, it was a lot of similiar code with copy/paste and small revisions between methods
+*Code written primarily by Dylan Vander Berg - 445 Lines
  */
 
 package farkle;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -29,7 +29,7 @@ import javax.script.ScriptException;
 public class CurrentTurn {
 	private int[] dice;//int array for value of dice
 	private boolean[] holdDice;
-	private boolean[] currentRollHold;
+	public boolean[] currentRollHold;
 	private int turnScore;
 	public static CurrentTurn currentTurn;
 	
@@ -50,16 +50,18 @@ public class CurrentTurn {
 
 	
 	public boolean rollDice(){
-		System.out.print("Dice are: ");
 		for(int i = 0; i < 6; i++){
 			if(!holdDice[i]){
 				dice[i] = (int)(Math.random() * 6) + 1;
-				System.out.print(dice[i] + ", ");
-			}else{
-				System.out.print("X, ");
 			}
 		}
-		FarkleFrame.frame.setDiceImages(dice);
+		int[] imageDice = dice.clone();
+		for(int i = 0; i < dice.length; i++){
+			if(holdDice[i]){
+				imageDice[i] = 0;
+			}
+		}
+		FarkleFrame.frame.setDiceImages(imageDice);
 		for(int i = 0; i < currentRollHold.length; i++){
 			currentRollHold[i] = false;
 		}
@@ -67,17 +69,13 @@ public class CurrentTurn {
 	}
 	
 	public boolean rollDice(int a, int b, int c, int d, int e, int f){
-		System.out.print("Dice are: ");
 			dice[0] = a;
 			dice[1] = b;
 			dice[2] = c;
 			dice[3] = d;
 			dice[4] = e;
 			dice[5] = f;
-			for(int die : dice){
-				System.out.print(die + ", ");
-			}
-			int[] imageDice = dice;
+			int[] imageDice = dice.clone();
 			for(int i = 0; i < dice.length; i++){
 				if(holdDice[i]){
 					imageDice[i] = 0;
@@ -86,12 +84,15 @@ public class CurrentTurn {
 			for(int i = 0; i < currentRollHold.length; i++){
 				currentRollHold[i] = false;
 			}
-			FarkleFrame.frame.setDiceImages(dice);
+			FarkleFrame.frame.setDiceImages(imageDice);
 
 		return !checkFarkle();
 	}
 	
 	public void holdDice(ArrayList<Integer> holdList){
+		for(int i = 0; i < currentRollHold.length; i++){
+			currentRollHold[i] = false;
+		}
 		for(int i = 0; i < holdList.size(); i++){
 			currentRollHold[holdList.get(i)] = true;
 		}
@@ -211,16 +212,6 @@ public class CurrentTurn {
 		return false;
 	}
 	
-	private ArrayList<Integer> findAllIndices(int num){
-		ArrayList<Integer> returnArray = new ArrayList<Integer>();
-		for(int i = 0; i < 6; i++){
-			if(dice[i] == num){
-				returnArray.add(i);
-			}
-		}
-		return returnArray;
-	}
-	
 	private int[] getNumOfNumsCheck(){
 		int[] numOfNums = new int[6];//array to count the amount of each number(i.e. index 0 is num of 1s)
 		for(int i = 0; i < dice.length; i++){
@@ -238,7 +229,7 @@ public class CurrentTurn {
 	private int[] getNumOfNumsScore(){
 		int[] numOfNums = new int[6];//array to count the amount of each number(i.e. index 0 is num of 1s)
 		for(int i = 0; i < dice.length; i++){
-			if(currentRollHold[i]){
+			if(currentRollHold[i] && !holdDice[i]){
 				numOfNums[dice[i] - 1]++;
 			}
 		}
@@ -281,7 +272,7 @@ public class CurrentTurn {
 			if(numOfNums[i] == 4){
 				int numUsed = 0;
 				for(int ii = 0; ii < dice.length; ii++){
-					if(dice[ii] == i + 1 && currentRollHold[ii] && numUsed < 4){
+					if(dice[ii] == i + 1 && currentRollHold[ii] && numUsed < 4 && !holdDice[ii]){
 						holdDice[ii] = true;
 						currentRollHold[ii] = false;
 						numUsed++;
@@ -300,7 +291,7 @@ public class CurrentTurn {
 			combinationScore += 1000;//award 1000 points for 3 ones
 			int numUsed = 0;
 			for(int i = 0; i < dice.length; i++){
-				if(dice[i] == 1 && currentRollHold[i] && numUsed < 3){
+				if(dice[i] == 1 && currentRollHold[i] && numUsed < 3 && !holdDice[i]){
 					holdDice[i] = true;
 					currentRollHold[i] = false;//remove dice so they aren't scored twice
 					numUsed++;
@@ -312,7 +303,7 @@ public class CurrentTurn {
 				combinationScore += (i + 1) * 100; //add 100 times dice value for other 3 of a kinds
 				int numUsed = 0;
 				for(int ii = 0; ii < dice.length; ii++){
-					if(dice[ii] == i + 1 && currentRollHold[ii] && numUsed < 3){
+					if(dice[ii] == i + 1 && currentRollHold[ii] && numUsed < 3 && !holdDice[ii]){
 						holdDice[ii] = true;
 						currentRollHold[ii] = false;//remove dice so they aren't scored twice
 						numUsed++;
@@ -353,7 +344,7 @@ public class CurrentTurn {
 				if(numOfNums[i] == 4){
 					numPairs += 2;
 					for(int ii = 0; ii < dice.length; ii++){
-						if(dice[ii] == i + 1 && currentRollHold[ii]){
+						if(dice[ii] == i + 1 && currentRollHold[ii] && !holdDice[ii]){
 							holdDice[ii] = true;
 							currentRollHold[ii] = false;
 						}
@@ -361,7 +352,7 @@ public class CurrentTurn {
 				}else if(numOfNums[i] == 2){
 					numPairs++;
 					for(int ii = 0; ii < dice.length; ii++){
-						if(dice[ii] == i + 1 && currentRollHold[ii]){
+						if(dice[ii] == i + 1 && currentRollHold[ii] && !holdDice[ii]){
 							holdDice[ii] = true;
 							currentRollHold[ii] = false;
 						}
@@ -376,7 +367,7 @@ public class CurrentTurn {
 	private int scoreOnes() {
 		int combinationScore = 0;
 		for(int i = 0; i < dice.length; i++){
-			if(dice[i] == 1 && currentRollHold[i]){
+			if(dice[i] == 1 && currentRollHold[i] && !holdDice[i]){
 				holdDice[i] = true;
 				currentRollHold[i] = false;
 				combinationScore += 100;
@@ -388,7 +379,7 @@ public class CurrentTurn {
 	private int scoreFives() {
 		int combinationScore = 0;
 		for(int i = 0; i < dice.length; i++){
-			if(dice[i] == 5 && currentRollHold[i]){
+			if(dice[i] == 5 && currentRollHold[i] && !holdDice[i]){
 				holdDice[i] = true;
 				currentRollHold[i] = false;
 				combinationScore += 50;
@@ -408,11 +399,16 @@ public class CurrentTurn {
 		turnScore += scoreThreeOfAKind();
 		turnScore += scoreOnes();
 		turnScore += scoreFives();
-		System.out.println("Current Score is: " + turnScore);
 		FarkleFrame.frame.turnScore.setText(turnScore + "");
 	}
-
-	public int checkScore(ArrayList<Integer> holdDice) {
+	
+	/**
+	 * 
+	 * @param holdDice
+	 * @return
+	 */
+	public Object[] checkScore(ArrayList<Integer> holdDice) {
+		boolean[] tempHold = this.holdDice.clone();
 		holdDice(holdDice);
 		int rollScore = 0;
 		rollScore += scoreSixOfAKind();
@@ -423,10 +419,21 @@ public class CurrentTurn {
 		rollScore += scoreThreeOfAKind();
 		rollScore += scoreOnes();
 		rollScore += scoreFives();
-		for(int i = 0; i < holdDice.size(); i++){
-			currentRollHold[holdDice.get(i)] = false;
+		this.holdDice = tempHold.clone();
+		Object[] currentSelection = new Object[2];
+		boolean allUsed = true;
+		for(boolean b : currentRollHold){allUsed=b?false:allUsed;}
+		holdDice(holdDice);
+		currentSelection[0] = rollScore;
+		currentSelection[1] = allUsed;
+		return currentSelection;
+	}
+
+	public void clearHoldDice() {
+		for(int i = 0; i < holdDice.length; i++){
+			holdDice[i] = false;
 		}
-		return rollScore;
+		
 	}
 
 	
