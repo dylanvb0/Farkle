@@ -76,6 +76,9 @@ public class Farkle {
 			frame.appendMessage("Farkle");
 			frame.appendMessage("Player " + (player1Turn ? 1 : 2) + " Turn");
 			CurrentTurn.currentTurn = null;
+			frame.player1Label.setForeground(player1Turn?Color.RED:Color.BLACK);
+			frame.player2Label.setForeground(player1Turn?Color.BLACK:Color.RED);
+			
 			
 		}
 	}
@@ -85,7 +88,8 @@ public class Farkle {
 		if(isPlayer1Turn()){
 			player1 += roll.getTurnScore();
 			frame.player1Score.setText(player1 + "");
-			frame.player2Label.setForeground(Color.DARK_GRAY);
+			frame.player1Label.setForeground(Color.BLACK);
+			frame.player2Label.setForeground(Color.RED);
 			if(player1 > 10000){//if player won
 				frame.appendMessage("Player 1 wins");
 				frame.disableButtons();
@@ -96,7 +100,8 @@ public class Farkle {
 		else{
 			player2 += roll.getTurnScore();
 			frame.player2Score.setText(player2 + "");
-			frame.player1Label.setForeground(Color.DARK_GRAY);
+			frame.player1Label.setForeground(Color.RED);
+			frame.player2Label.setForeground(Color.BLACK);
 			if(player2 > 10000){
 				frame.appendMessage("Player 2 wins");
 				JOptionPane.showMessageDialog(frame, "Player 2 wins!");

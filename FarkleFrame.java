@@ -8,6 +8,7 @@ package farkle;
 
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -96,22 +97,29 @@ public class FarkleFrame extends JFrame {
 			}
         	
         });
+        Font bigFont = new Font("Dialog.bold", Font.PLAIN, 36);
+        Font smallFont = new Font("Dialog.bold", Font.PLAIN, 24);
         player1Label = new JLabel();
         player1Label.setVisible(true);
         player1Label.setText("Player 1");
-        player1Label.setForeground(Color.DARK_GRAY);
+        player1Label.setForeground(Color.RED);
+        player1Label.setFont(smallFont);
         player2Label = new JLabel();
         player2Label.setVisible(true);
         player2Label.setText("Player 2");
+        player2Label.setFont(smallFont);
         player1Score = new JLabel();
         player1Score.setVisible(true);
         player1Score.setText("0");
+        player1Score.setFont(bigFont);
         turnScore = new JLabel();
         turnScore.setVisible(true);
         turnScore.setText("0");
+        turnScore.setFont(bigFont);
         player2Score = new JLabel();
         player2Score.setVisible(true);
         player2Score.setText("0");
+        player2Score.setFont(bigFont);
         BufferedImage userImage = ImageIO.read(new File("src/farkle/user.png"));
         JLabel userImageLabel = new JLabel(new ImageIcon(userImage.getScaledInstance(200, 200, Image.SCALE_FAST)));
         BufferedImage user2Image = ImageIO.read(new File("src/farkle/user-2.png"));
@@ -1069,6 +1077,8 @@ public class FarkleFrame extends JFrame {
         /* END - Dan Kelly*/
         /* BEGIN - Dylan Vander Berg*/
         mainOut = new JLabel();
+        
+        mainOut.setFont(smallFont);
         createLayout(rollButton, bankButton, player1Label, player2Label, player1Score, turnScore, player2Score, userImageLabel, user2ImageLabel,
         		player1Hold1, player1Hold2, player1Hold3, player1Hold4, player1Hold5, player1Hold6,
         		player2Hold1, player2Hold2, player2Hold3, player2Hold4, player2Hold5, player2Hold6,
