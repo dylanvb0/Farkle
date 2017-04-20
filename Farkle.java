@@ -28,6 +28,7 @@ public class Farkle {
 		frame = new FarkleFrame();
         frame.setVisible(true);	
 		setPlayer1Turn(true);
+		frame.disableBank();
 
 	}
 	public static void rollDice(){
@@ -85,6 +86,7 @@ public class Farkle {
 	
 	public static void bankPoints(){
 		roll.scoreTurn();//score turn based on selected dice
+		frame.disableBank();
 		if(isPlayer1Turn()){
 			player1 += roll.getTurnScore();
 			frame.player1Score.setText(player1 + "");
